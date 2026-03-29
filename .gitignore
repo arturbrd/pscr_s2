@@ -54,3 +54,5 @@ Testing/
 # 📦 Install artifacts
 
 install_manifest.txt
+
+/dep/mqtt5/build/

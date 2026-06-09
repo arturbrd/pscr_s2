@@ -8,15 +8,18 @@
 #include "main.hpp"
 #include "threads.hpp"
 
+
 mqd_t mqtt_reader_queue;
-pthread_mutex_t mqtt_buff_mutex;
+mqd_t ready_map_queue;
+pthread_mutex_t weather_data_mutex;
+std::unordered_map<long, WeatherMap> weather_data;
 
 class MqttCallback : public virtual mqtt::callback {
     public:
         void message_arrived(mqtt::const_message_ptr msg) override {
             std::string msg_string = msg->to_string();
-            std::cout << "Topic: " << msg->get_topic() << std::endl;
-            std::cout << "Message: " << msg_string << std::endl;
+            // std::cout << "Topic: " << msg->get_topic() << std::endl;
+            // std::cout << "Message: " << msg_string << std::endl;
 
             if (mq_send(mqtt_reader_queue, msg_string.c_str(), msg_string.size() + 1, 0) == -1) {
                 std::cerr << "Error: Couldn't send msg to queue" << std::endl;
@@ -33,18 +36,29 @@ int main() {
     MqttCallback mqtt_callback;
     client.set_callback(mqtt_callback);
 
-    struct mq_attr attr;
-    attr.mq_maxmsg = 10;
-    attr.mq_msgsize = 4096;
+    struct mq_attr attr_mqtt;
+    attr_mqtt.mq_maxmsg = 10;
+    attr_mqtt.mq_msgsize = 4096;
 
-    mqtt_reader_queue = mq_open("/mqtt_reader_queue", O_CREAT | O_RDWR, 0666, &attr);
+    mqtt_reader_queue = mq_open("/mqtt_reader_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt);
     if (mqtt_reader_queue == (mqd_t)-1) {
         std::cerr << "Error: Couldn't open queue" << std::endl
                     << strerror(errno) << std::endl;
         return 1;
     }
 
-    if (pthread_mutex_init(&mqtt_buff_mutex, NULL) != 0) {
+    struct mq_attr attr_ready;
+    attr_ready.mq_maxmsg = 10;
+    attr_ready.mq_msgsize = sizeof(long);
+
+    ready_map_queue = mq_open("/ready_map_queue", O_CREAT | O_RDWR, 0666, &attr_ready);
+    if (ready_map_queue == (mqd_t)-1) {
+        std::cerr << "Error: Couldn't open queue" << std::endl
+                    << strerror(errno) << std::endl;
+        return 1;
+    }
+
+    if (pthread_mutex_init(&weather_data_mutex, NULL) != 0) {
         std::cerr << "Error: Couldn't initialize mutex" << std::endl;
     }
 
@@ -55,6 +69,13 @@ int main() {
         client.subscribe("pscr/c12/0", 1);
         client.subscribe("pscr/c12/1", 1);
         client.subscribe("pscr/c12/2", 1);
+        client.subscribe("pscr/c12/3", 1);
+        client.subscribe("pscr/c12/4", 1);
+        client.subscribe("pscr/c12/5", 1);
+        client.subscribe("pscr/c12/6", 1);
+        client.subscribe("pscr/c12/7", 1);
+        client.subscribe("pscr/c12/8", 1);
+        client.subscribe("pscr/c12/9", 1);
         std::cout << "Connected!" << std::endl;
     } catch (const mqtt::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

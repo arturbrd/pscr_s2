@@ -5,10 +5,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(Threads REQUIRED)
 find_package(PahoMqttCpp REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_executable(app.exe 
     src/main.cpp
     src/threads.cpp
+    src/weather.cpp
 )
 
 
@@ -18,5 +20,5 @@ target_include_directories(app.exe
 target_link_libraries(app.exe
     PahoMqttCpp::paho-mqttpp3
     Threads::Threads
+    nlohmann_json::nlohmann_json
 )
-message(STATUS "Paho include dirs: ${PahoMqttCpp_INCLUDE_DIRS}")

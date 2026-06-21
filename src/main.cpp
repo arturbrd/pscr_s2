@@ -34,7 +34,7 @@ class MqttCallback : public virtual mqtt::callback {
 int main() {
 
     mqtt::connect_options connOpts;
-    connOpts.set_mqtt_version(MQTTVERSION_5);
+    connOpts.set_mqtt_version(MQTTVERSION_3_1_1);
 
     MqttCallback mqtt_callback;
     client.set_callback(mqtt_callback);

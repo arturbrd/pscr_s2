@@ -26,6 +26,12 @@ struct WeatherMap {
     std::vector<Record> records;
 };
 
+struct AverageMsg {
+    long timestamp;
+    double average_temp_c;
+    double average_wind_mps;
+    double average_cloud_pct;
+};
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Record,
     point_id, lat, lon, temp_c, wind_mps,
@@ -34,5 +40,9 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Record,
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Data,
     task_id, timestamp, count, records)
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AverageMsg,
+    timestamp, average_temp_c, average_wind_mps, average_cloud_pct)
+
 std::ostream& operator<<(std::ostream& os, const Record& r);
 std::ostream& operator<<(std::ostream& os, const Data& r);
+std::ostream& operator<<(std::ostream& os, const AverageMsg& r);

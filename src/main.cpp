@@ -40,23 +40,23 @@ int main() {
     client.set_callback(mqtt_callback);
 
     struct mq_attr attr_mqtt;
-    attr_mqtt.mq_maxmsg = 20;
+    attr_mqtt.mq_maxmsg = 10;
     attr_mqtt.mq_msgsize = 4096;
-
+    
     mqtt_reader_queue = mq_open("/mqtt_reader_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt);
     if (mqtt_reader_queue == (mqd_t)-1) {
-        std::cerr << "Error: Couldn't open queue" << std::endl
+        std::cerr << "Error: Couldn't open queue /mqtt_reader_queue" << std::endl
                     << strerror(errno) << std::endl;
         return 1;
     }
 
     struct mq_attr attr_mqtt_sender;
-    attr_mqtt_sender.mq_maxmsg = 20;
+    attr_mqtt_sender.mq_maxmsg = 10;
     attr_mqtt_sender.mq_msgsize = 4096;
 
     mqtt_sender_queue_raw = mq_open("/mqtt_sender_queue_raw", O_CREAT | O_RDWR, 0666, &attr_mqtt_sender);
     if (mqtt_sender_queue_raw == (mqd_t)-1) {
-        std::cerr << "Error: Couldn't open queue" << std::endl
+        std::cerr << "Error: Couldn't open queue /mqtt_sender_queue_raw" << std::endl
                     << strerror(errno) << std::endl;
         return 1;
     }
@@ -67,7 +67,7 @@ int main() {
 
     mqtt_sender_queue_avg = mq_open("/mqtt_sender_queue_avg", O_CREAT | O_RDWR, 0666, &attr_mqtt_sender_avg);
     if (mqtt_sender_queue_avg == (mqd_t)-1) {
-        std::cerr << "Error: Couldn't open queue" << std::endl
+        std::cerr << "Error: Couldn't open queue /mqtt_sender_queue_avg" << std::endl
                     << strerror(errno) << std::endl;
         return 1;
     }
@@ -78,7 +78,7 @@ int main() {
 
     ready_map_queue = mq_open("/ready_map_queue", O_CREAT | O_RDWR, 0666, &attr_ready);
     if (ready_map_queue == (mqd_t)-1) {
-        std::cerr << "Error: Couldn't open queue" << std::endl
+        std::cerr << "Error: Couldn't open queue /ready_map_queue" << std::endl
                     << strerror(errno) << std::endl;
         return 1;
     }

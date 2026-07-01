@@ -24,7 +24,7 @@ long find_nearest(long ts) {
 }
 
 void* reader_thread_func(void* arg) {
-    std::cout << "Hello from reader thread\n";
+    std::cout << "Hello from reader thread" << std::endl;
     char buffer[4096];
     while (true) {
         ssize_t bytes_received = mq_receive(mqtt_reader_queue, buffer, 4096, NULL);
@@ -67,7 +67,7 @@ void* reader_thread_func(void* arg) {
 }
 
 void* average_thread_func(void* arg) {
-    std::cout << "Hello from average thread\n";
+    std::cout << "Hello from average thread" << std::endl;
     char buffer[sizeof(long)];
 
     while (true) {
@@ -136,7 +136,7 @@ void* average_thread_func(void* arg) {
 }
 
 void* sender_thread_avg_func(void* arg) {
-    std::cout << "Hello from sender thread\n";
+    std::cout << "Hello from sender thread" << std::endl;
     char buffer[1024];
     while (true) {
         ssize_t bytes_received = mq_receive(mqtt_sender_queue_avg, buffer, 1024, NULL);
@@ -145,14 +145,21 @@ void* sender_thread_avg_func(void* arg) {
             std::cerr << "Error: Couldn't read from a queue" << std::endl;
             break;
         } else {
+            try {
+                client.publish(
+                    "weather/avg",
+                    buffer,
+                    bytes_received,
+                    0,
+                    false
+                );
 
-            client.publish(
-                "weather/avg",
-                buffer,
-                bytes_received,
-                0,
-                false
-            );
+                std::cout << "Successfully published message to weather/avg" << std::endl;
+            }
+            catch (const mqtt::exception& e) {
+                std::cerr << "Failed to publish message to weather/avg: "
+                        << e.what() << std::endl;
+            }
         }
     }
 
@@ -160,7 +167,7 @@ void* sender_thread_avg_func(void* arg) {
 }
 
 void* sender_thread_raw_func(void* arg) {
-    std::cout << "Hello from sender thread\n";
+    std::cout << "Hello from sender thread" << std::endl;
     char buffer[4096];
     while (true) {
         ssize_t bytes_received = mq_receive(mqtt_sender_queue_raw, buffer, 4096, NULL);
@@ -170,13 +177,21 @@ void* sender_thread_raw_func(void* arg) {
             break;
         } else {
 
-            client.publish(
-                "weather/raw",
-                buffer,
-                bytes_received,
-                0,
-                false
-            );
+            try {
+                client.publish(
+                    "weather/avg",
+                    buffer,
+                    bytes_received,
+                    0,
+                    false
+                );
+
+                std::cout << "Successfully published message to weather/raw" << std::endl;
+            }
+            catch (const mqtt::exception& e) {
+                std::cerr << "Failed to publish message to weather/raw: "
+                        << e.what() << std::endl;
+            }
         }
     }
 

@@ -179,7 +179,7 @@ void* sender_thread_raw_func(void* arg) {
 
             try {
                 client.publish(
-                    "weather/avg",
+                    "weather/raw",
                     buffer,
                     bytes_received,
                     0,
